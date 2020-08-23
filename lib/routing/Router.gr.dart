@@ -9,9 +9,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import 'data/item.dart';
-import 'pages/details_page.dart';
-import 'pages/feed_page.dart';
+import '../data/item.dart';
+import '../pages/details_page.dart';
+import '../pages/feed_page.dart';
+import '../pages/lang_settings.dart';
 
 class Routes {
   static const String feedPage = '/';
@@ -53,10 +54,12 @@ extension RouterExtendedNavigatorStateX on ExtendedNavigatorState {
 class FeedPageRoutes {
   static const String detailScreen = '/details';
   static const String jobsPage = '/jobs';
+  static const String languageSettings = '/lang_settings';
   static const String newItemsPage = '/newItems';
   static const all = <String>{
     detailScreen,
     jobsPage,
+    languageSettings,
     newItemsPage,
   };
 }
@@ -67,6 +70,7 @@ class FeedPageRouter extends RouterBase {
   final _routes = <RouteDef>[
     RouteDef(FeedPageRoutes.detailScreen, page: DetailScreen),
     RouteDef(FeedPageRoutes.jobsPage, page: JobsPage),
+    RouteDef(FeedPageRoutes.languageSettings, page: LanguageSettings),
     RouteDef(FeedPageRoutes.newItemsPage, page: NewItemsPage),
   ];
   @override
@@ -82,6 +86,12 @@ class FeedPageRouter extends RouterBase {
     JobsPage: (data) {
       return MaterialPageRoute<dynamic>(
         builder: (context) => JobsPage(),
+        settings: data,
+      );
+    },
+    LanguageSettings: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => LanguageSettings(),
         settings: data,
       );
     },
@@ -108,6 +118,9 @@ extension FeedPageRouterExtendedNavigatorStateX on ExtendedNavigatorState {
       );
 
   Future<dynamic> pushJobsPage() => push<dynamic>(FeedPageRoutes.jobsPage);
+
+  Future<dynamic> pushLanguageSettings() =>
+      push<dynamic>(FeedPageRoutes.languageSettings);
 
   Future<dynamic> pushNewItemsPage() =>
       push<dynamic>(FeedPageRoutes.newItemsPage);

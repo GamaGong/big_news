@@ -1,24 +1,25 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:big_news/Router.gr.dart';
 import 'package:big_news/api/api.dart';
 import 'package:big_news/data/item.dart';
+import 'package:big_news/generated/l10n.dart';
+import 'package:big_news/routing/Router.gr.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 final itemService = createClient().getService<ItemsService>();
 
-Future<Item> getItem(int itemId) async {
+Future<Item> getItem(int itemId, BuildContext context) async {
   final response = await itemService.getItem(itemId);
 
   if (response.isSuccessful) {
     return response.body;
   } else {
-    throw Exception('Failed to load album');
+    throw Exception(S.of(context).failedToLoadItem);
   }
 }
 
-Future<BuiltList<int>> getNewStories() async {
+Future<BuiltList<int>> getNewStories(BuildContext context) async {
   final response = await itemService.getNewStories();
 
   if (response.isSuccessful) {
@@ -26,11 +27,11 @@ Future<BuiltList<int>> getNewStories() async {
     return response.body;
   } else {
     // error from server
-    throw Exception('Failed to load album');
+    throw S.of(context).failedToLoadPage;
   }
 }
 
-Future<BuiltList<int>> getJobs() async {
+Future<BuiltList<int>> getJobs(BuildContext context) async {
   final response = await itemService.getJobsIds();
 
   if (response.isSuccessful) {
@@ -38,7 +39,7 @@ Future<BuiltList<int>> getJobs() async {
     return response.body;
   } else {
     // error from server
-    throw Exception('Failed to load album');
+    throw S.of(context).failedToLoadPage;
   }
 }
 
@@ -58,13 +59,17 @@ class _FeedPageState extends State<FeedPage> {
         type: BottomNavigationBarType.fixed,
         onTap: _onTap,
         items: <BottomNavigationBarItem>[
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.arrow_drop_up),
-            title: Text('New'),
+            title: Text(S.of(context).pageNewStories),
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.work),
-            title: Text('Job'),
+            title: Text(S.of(context).pageJob),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            title: Text(S.of(context).pageSettings),
           ),
         ],
       ),
@@ -77,6 +82,9 @@ class _FeedPageState extends State<FeedPage> {
           ExtendedNavigator(
             initialRoute: '/jobs',
           ),
+          ExtendedNavigator(
+            initialRoute: '/lang_settings',
+          )
         ],
       ),
     );
@@ -89,7 +97,7 @@ class NewItemsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<BuiltList<int>>(
-      future: getNewStories(),
+      future: getNewStories(context),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
@@ -99,7 +107,7 @@ class NewItemsPage extends StatelessWidget {
             );
           case ConnectionState.done:
             return (snapshot.hasError)
-                ? Text("${snapshot.error}")
+                ? Center(child: Text("${snapshot.error}"))
                 : ListView.builder(
                     itemCount: snapshot.data.length,
                     itemBuilder: (BuildContext context, int index) =>
@@ -109,7 +117,7 @@ class NewItemsPage extends StatelessWidget {
                     ),
                   );
           default:
-            return Text('Ну это уже слишком');
+            return Text(S.of(context).somethingStrange);
         }
       },
     );
@@ -120,7 +128,7 @@ class JobsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<BuiltList<int>>(
-      future: getJobs(),
+      future: getJobs(context),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
@@ -130,7 +138,7 @@ class JobsPage extends StatelessWidget {
             );
           case ConnectionState.done:
             return (snapshot.hasError)
-                ? Text("${snapshot.error}")
+                ? Center(child: Text("${snapshot.error}"))
                 : ListView.builder(
                     itemCount: snapshot.data.length,
                     itemBuilder: (BuildContext context, int index) =>
@@ -140,7 +148,7 @@ class JobsPage extends StatelessWidget {
                     ),
                   );
           default:
-            return Text('Ну это уже слишком');
+            return Text(S.of(context).somethingStrange);
         }
       },
     );
@@ -155,7 +163,7 @@ class ItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: getItem(id),
+      future: getItem(id, context),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
@@ -178,7 +186,7 @@ class LoadingItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircularProgressIndicator(),
-      title: Text('Loading...'),
+      title: Text(S.of(context).loadingItem),
     );
   }
 }
@@ -191,7 +199,7 @@ class ErrorItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text('Ops... Something went wrong :(\n$error'),
+      title: Text(S.of(context).errorTextWithError(error)),
     );
   }
 }
