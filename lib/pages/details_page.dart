@@ -1,4 +1,5 @@
 import 'package:big_news/data/item.dart';
+import 'package:big_news/generated/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class DetailScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Text(item.url ?? 'No url. Sorry :('),
+        child: Text(item.url ?? S.of(context).noUrlText),
       ),
     );
   }

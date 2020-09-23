@@ -1,0 +1,11 @@
+{
+  "pageNewStories": "Новинки",
+  "pageJob": "Работа",
+  "pageSettings": "Настройки",
+  "somethingStrange": "Произошло что-то страшное... похоже 404",
+  "failedToLoadItem": "Не удалось загрузить элемент",
+  "failedToLoadPage": "Не удалось загрузить страницу",
+  "loadingItem": "Загрузка...",
+  "noUrlText": "Ссылка отсутсвует. Простите :(",
+  "errorTextWithError": "Упс... Что-то пошло не так :({error})"
+}

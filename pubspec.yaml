@@ -27,7 +27,12 @@ dependencies:
   auto_route: ^0.6.7
   chopper: ^3.0.3
   chopper_built_value: ^0.0.3
+  intl: ^0.16.1
+
   flutter:
+    sdk: flutter
+
+  flutter_localizations:
     sdk: flutter
 
 
@@ -84,3 +89,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_intl:
+  enabled: true

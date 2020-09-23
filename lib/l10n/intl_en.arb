@@ -1,0 +1,11 @@
+{
+  "pageNewStories": "New",
+  "pageJob": "Job",
+  "pageSettings": "Settings",
+  "somethingStrange": "Something strange happened... 404 I guess",
+  "failedToLoadItem": "Failed to load item",
+  "failedToLoadPage": "Failed to load page",
+  "loadingItem": "Loading...",
+  "noUrlText": "No url. Sorry :(",
+  "errorTextWithError": "Ops... Something went wrong :({error})"
+}
