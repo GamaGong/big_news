@@ -3,45 +3,18 @@ import 'package:big_news/api/api.dart';
 import 'package:big_news/data/item.dart';
 import 'package:big_news/generated/l10n.dart';
 import 'package:big_news/routing/Router.gr.dart';
+import 'package:big_news/state/app_state.dart';
+import 'package:big_news/state/middleware.dart';
+import 'package:big_news/state/reducers.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:chopper/chopper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
 
 final itemService = createClient().getService<ItemsService>();
-
-Future<Item> getItem(int itemId, BuildContext context) async {
-  final response = await itemService.getItem(itemId);
-
-  if (response.isSuccessful) {
-    return response.body;
-  } else {
-    throw Exception(S.of(context).failedToLoadItem);
-  }
-}
-
-Future<BuiltList<int>> getNewStories(BuildContext context) async {
-  final response = await itemService.getNewStories();
-
-  if (response.isSuccessful) {
-    // successful request
-    return response.body;
-  } else {
-    // error from server
-    throw S.of(context).failedToLoadPage;
-  }
-}
-
-Future<BuiltList<int>> getJobs(BuildContext context) async {
-  final response = await itemService.getJobsIds();
-
-  if (response.isSuccessful) {
-    // successful request
-    return response.body;
-  } else {
-    // error from server
-    throw S.of(context).failedToLoadPage;
-  }
-}
 
 class FeedPage extends StatefulWidget {
   @override
@@ -93,64 +66,127 @@ class _FeedPageState extends State<FeedPage> {
   _onTap(int index) => setState(() => _selectedIndex = index);
 }
 
+@immutable
+class FeedScreenViewModel {
+  final LoadingState loadingState;
+  final BuiltList<int> itemsIds;
+
+  FeedScreenViewModel({
+    @required this.loadingState,
+    @required this.itemsIds,
+  });
+
+  factory FeedScreenViewModel.fromStore(Store<FeedScreenState> store,
+      Future<Response<BuiltList<int>>> Function() loadingBlock) {
+    if (store.state.loadingState == LoadingState.none)
+      store.dispatch(loadItemsIds(loadingBlock));
+    return FeedScreenViewModel(
+      loadingState: store.state.loadingState,
+      itemsIds: store.state.itemsIds,
+    );
+  }
+}
+
 class NewItemsPage extends StatelessWidget {
+  final store = Store<FeedScreenState>(
+    feedScreenReducer,
+    initialState: FeedScreenState.initial(),
+    middleware: [thunkMiddleware],
+  );
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<BuiltList<int>>(
-      future: getNewStories(context),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          case ConnectionState.done:
-            return (snapshot.hasError)
-                ? Center(child: Text("${snapshot.error}"))
-                : ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (BuildContext context, int index) =>
-                        ItemWidget(
-                      snapshot.data[index],
-                      key: Key(snapshot.data[index].toString()),
-                    ),
-                  );
-          default:
-            return Text(S.of(context).somethingStrange);
-        }
-      },
+    return StoreProvider<FeedScreenState>(
+      store: store,
+      child: StoreConnector<FeedScreenState, FeedScreenViewModel>(
+        converter: (Store<FeedScreenState> store) =>
+            FeedScreenViewModel.fromStore(store, itemService.getNewStories),
+        builder: (_, vm) {
+          switch (vm.loadingState) {
+            case LoadingState.loaded:
+              return ListView.builder(
+                itemCount: vm.itemsIds.length,
+                itemBuilder: (BuildContext context, int index) => ItemWidget(
+                  vm.itemsIds[index],
+                  key: Key(vm.itemsIds[index].toString()),
+                ),
+              );
+            case LoadingState.error:
+              return Center(child: Text(S.of(context).failedToLoadPage));
+            case LoadingState.loading:
+            case LoadingState.none:
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            default:
+              return Text(S.of(context).somethingStrange);
+          }
+        },
+      ),
     );
   }
 }
 
 class JobsPage extends StatelessWidget {
+  final store = Store<FeedScreenState>(
+    feedScreenReducer,
+    initialState: FeedScreenState.initial(),
+    middleware: [thunkMiddleware],
+  );
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<BuiltList<int>>(
-      future: getJobs(context),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          case ConnectionState.done:
-            return (snapshot.hasError)
-                ? Center(child: Text("${snapshot.error}"))
-                : ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (BuildContext context, int index) =>
-                        ItemWidget(
-                      snapshot.data[index],
-                      key: Key(snapshot.data[index].toString()),
-                    ),
-                  );
-          default:
-            return Text(S.of(context).somethingStrange);
-        }
-      },
+    return StoreProvider<FeedScreenState>(
+      store: store,
+      child: StoreConnector<FeedScreenState, FeedScreenViewModel>(
+        converter: (Store<FeedScreenState> store) =>
+            FeedScreenViewModel.fromStore(store, itemService.getJobsIds),
+        builder: (_, vm) {
+          switch (vm.loadingState) {
+            case LoadingState.loaded:
+              return ListView.builder(
+                itemCount: vm.itemsIds.length,
+                itemBuilder: (BuildContext context, int index) => ItemWidget(
+                  vm.itemsIds[index],
+                  key: Key(vm.itemsIds[index].toString()),
+                ),
+              );
+            case LoadingState.error:
+              return Center(child: Text(S.of(context).failedToLoadPage));
+            case LoadingState.loading:
+            case LoadingState.none:
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            default:
+              return Text(S.of(context).somethingStrange);
+          }
+        },
+      ),
+    );
+  }
+}
+
+@immutable
+class ItemViewModel {
+  final int itemId;
+  final LoadingState loadingState;
+  final Item item;
+
+  ItemViewModel({
+    @required this.itemId,
+    @required this.loadingState,
+    @required this.item,
+  });
+
+  factory ItemViewModel.fromStore(Store<FeedScreenState> store, int itemId) {
+    final itemState = store.state.itemsStates[itemId];
+    if (itemState == null || itemState.loadingState == LoadingState.none)
+      store.dispatch(loadItem(itemId, itemService));
+    return ItemViewModel(
+      loadingState: itemState?.loadingState ?? LoadingState.none,
+      itemId: itemId,
+      item: itemState?.item,
     );
   }
 }
@@ -162,19 +198,22 @@ class ItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: getItem(id, context),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-          case ConnectionState.active:
+    return StoreConnector<FeedScreenState, ItemViewModel>(
+      converter: (Store<FeedScreenState> store) =>
+          ItemViewModel.fromStore(store, id),
+      builder: (context, vm) {
+        switch (vm.loadingState) {
+          case LoadingState.none:
+          case LoadingState.loading:
             return LoadingItem();
-          case ConnectionState.done:
-            return (snapshot.hasError)
-                ? ErrorItem(snapshot.error)
-                : LoadedItem(snapshot.data);
+          case LoadingState.loaded:
+            return LoadedItem(vm.item);
+          case LoadingState.error:
+            return ErrorItem(S
+                .of(context)
+                .errorTextWithError(S.of(context).failedToLoadItem));
           default:
-            return ErrorItem(snapshot.connectionState);
+            return Text(S.of(context).somethingStrange);
         }
       },
     );
