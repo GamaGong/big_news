@@ -1,45 +1,69 @@
-import 'package:big_news/generated/l10n.dart';
+import 'package:big_news/state/actions.dart';
+import 'package:big_news/state/app_state.dart';
+import 'package:big_news/state/locale.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
-class LanguageSettings extends StatefulWidget {
-  @override
-  _LanguageSettingsState createState() => _LanguageSettingsState();
-}
-
-class _LanguageSettingsState extends State<LanguageSettings> {
-  var currentLocale = Intl.getCurrentLocale();
-
+class LanguageSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: S.delegate.supportedLocales.map((e) => LangItem(e, e.toLanguageTag() == currentLocale, setLocale)).toList(),
+      child: StoreConnector<AppState, LangViewModel>(
+        converter: (Store<AppState> store) => LangViewModel.fromStore(store),
+        builder: (_, vm) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: AppLocale.values
+              .map((e) => LangItem.fromAppLocale(e, vm))
+              .toList(),
+        ),
       ),
     );
-  }
-
-  setLocale(Locale newLocale) async {
-    await S.load(newLocale);
-    setState(() {
-      currentLocale = Intl.getCurrentLocale();
-    });
   }
 }
 
 class LangItem extends StatelessWidget {
-  final Locale locale;
+  final AppLocale appLocale;
   final bool isChecked;
-  final Function(Locale) onPressed;
+  final Function(AppLocale) onPressed;
 
-  LangItem(this.locale, this.isChecked, this.onPressed);
+  LangItem(this.appLocale, this.isChecked, this.onPressed);
+
+  factory LangItem.fromAppLocale(AppLocale appLocale, LangViewModel vm) =>
+      LangItem(appLocale, appLocale == vm.currentLocale, vm.setLocale);
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-      child: Text(locale.toLanguageTag(), style: TextStyle(fontSize: 20),),
-      onPressed: isChecked ? null : () => onPressed(locale),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: RaisedButton(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            appLocale.tag,
+            style: TextStyle(fontSize: 50),
+          ),
+        ),
+        onPressed: isChecked ? null : () => onPressed(appLocale),
+      ),
     );
   }
+}
+
+@immutable
+class LangViewModel {
+  final AppLocale currentLocale;
+  final Function(AppLocale) setLocale;
+
+  LangViewModel({
+    @required this.currentLocale,
+    @required this.setLocale,
+  });
+
+  factory LangViewModel.fromStore(Store<AppState> store) => LangViewModel(
+        currentLocale: store.state.appLocale,
+        setLocale: (AppLocale newLocale) {
+          store.dispatch(ChangeLocaleAction(newLocale: newLocale));
+        },
+      );
 }
