@@ -1,10 +1,12 @@
 import 'package:big_news/api/api.dart';
 import 'package:big_news/state/actions.dart';
 import 'package:big_news/state/app_state.dart';
+import 'package:big_news/state/locale.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:chopper/chopper.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 ThunkAction<FeedScreenState> loadItemsIds(Future<Response<BuiltList<int>>> Function() loadingBlock) =>
     (Store<FeedScreenState> store) async {
@@ -33,5 +35,13 @@ ThunkAction<FeedScreenState> loadItem(int itemId, ItemsService service) {
         store.dispatch(FailToLoadItem(itemId: itemId, error: null));
       }
     }
+  };
+}
+
+ThunkAction<AppState> changeLocale(AppLocale newAppLocale) {
+  return (Store<AppState> store) async {
+    store.dispatch(ChangeLocaleAction(newLocale: newAppLocale));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString((AppLocale).toString(), newAppLocale.tag);
   };
 }

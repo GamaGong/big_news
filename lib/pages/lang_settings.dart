@@ -1,6 +1,7 @@
 import 'package:big_news/state/actions.dart';
 import 'package:big_news/state/app_state.dart';
 import 'package:big_news/state/locale.dart';
+import 'package:big_news/state/middleware.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -63,7 +64,7 @@ class LangViewModel {
   factory LangViewModel.fromStore(Store<AppState> store) => LangViewModel(
         currentLocale: store.state.appLocale,
         setLocale: (AppLocale newLocale) {
-          store.dispatch(ChangeLocaleAction(newLocale: newLocale));
+          store.dispatch(changeLocale(newLocale));
         },
       );
 }

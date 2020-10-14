@@ -1,8 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:big_news/api/api.dart';
-import 'package:big_news/data/item.dart';
 import 'package:big_news/generated/l10n.dart';
-import 'package:big_news/routing/Router.gr.dart';
+import 'package:big_news/pages/feed_item.dart';
 import 'package:big_news/state/app_state.dart';
 import 'package:big_news/state/middleware.dart';
 import 'package:big_news/state/reducers.dart';
@@ -34,15 +33,19 @@ class _FeedPageState extends State<FeedPage> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.arrow_drop_up),
-            title: Text(S.of(context).pageNewStories),
+            label: S.of(context).pageNewStories,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.work),
-            title: Text(S.of(context).pageJob),
+            label: S.of(context).pageJob,
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.map),
+              label: S.of(context).maps
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            title: Text(S.of(context).pageSettings),
+            label: S.of(context).pageSettings,
           ),
         ],
       ),
@@ -56,8 +59,11 @@ class _FeedPageState extends State<FeedPage> {
             initialRoute: '/jobs',
           ),
           ExtendedNavigator(
+            initialRoute: '/maps',
+          ),
+          ExtendedNavigator(
             initialRoute: '/lang_settings',
-          )
+          ),
         ],
       ),
     );
@@ -163,98 +169,6 @@ class JobsPage extends StatelessWidget {
           }
         },
       ),
-    );
-  }
-}
-
-@immutable
-class ItemViewModel {
-  final int itemId;
-  final LoadingState loadingState;
-  final Item item;
-
-  ItemViewModel({
-    @required this.itemId,
-    @required this.loadingState,
-    @required this.item,
-  });
-
-  factory ItemViewModel.fromStore(Store<FeedScreenState> store, int itemId) {
-    final itemState = store.state.itemsStates[itemId];
-    if (itemState == null || itemState.loadingState == LoadingState.none)
-      store.dispatch(loadItem(itemId, itemService));
-    return ItemViewModel(
-      loadingState: itemState?.loadingState ?? LoadingState.none,
-      itemId: itemId,
-      item: itemState?.item,
-    );
-  }
-}
-
-class ItemWidget extends StatelessWidget {
-  final int id;
-
-  ItemWidget(this.id, {Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return StoreConnector<FeedScreenState, ItemViewModel>(
-      converter: (Store<FeedScreenState> store) =>
-          ItemViewModel.fromStore(store, id),
-      builder: (context, vm) {
-        switch (vm.loadingState) {
-          case LoadingState.none:
-          case LoadingState.loading:
-            return LoadingItem();
-          case LoadingState.loaded:
-            return LoadedItem(vm.item);
-          case LoadingState.error:
-            return ErrorItem(S
-                .of(context)
-                .errorTextWithError(S.of(context).failedToLoadItem));
-          default:
-            return Text(S.of(context).somethingStrange);
-        }
-      },
-    );
-  }
-}
-
-class LoadingItem extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircularProgressIndicator(),
-      title: Text(S.of(context).loadingItem),
-    );
-  }
-}
-
-class ErrorItem extends StatelessWidget {
-  final Object error;
-
-  ErrorItem(this.error);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(S.of(context).errorTextWithError(error)),
-    );
-  }
-}
-
-class LoadedItem extends StatelessWidget {
-  final Item item;
-
-  LoadedItem(this.item);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(item.title),
-      onTap: () {
-        ExtendedNavigator.of(context).pushDetailScreen(item: item);
-      },
     );
   }
 }

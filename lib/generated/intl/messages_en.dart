@@ -27,6 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "failedToLoadItem" : MessageLookupByLibrary.simpleMessage("Failed to load item"),
     "failedToLoadPage" : MessageLookupByLibrary.simpleMessage("Failed to load page"),
     "loadingItem" : MessageLookupByLibrary.simpleMessage("Loading..."),
+    "maps" : MessageLookupByLibrary.simpleMessage("Maps"),
     "noUrlText" : MessageLookupByLibrary.simpleMessage("No url. Sorry :("),
     "pageJob" : MessageLookupByLibrary.simpleMessage("Job"),
     "pageNewStories" : MessageLookupByLibrary.simpleMessage("New"),

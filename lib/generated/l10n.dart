@@ -122,6 +122,16 @@ class S {
       args: [error],
     );
   }
+
+  /// `Maps`
+  String get maps {
+    return Intl.message(
+      'Maps',
+      name: 'maps',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
