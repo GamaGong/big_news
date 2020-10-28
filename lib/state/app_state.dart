@@ -12,8 +12,8 @@ class AppState {
     @required this.appLocale,
   });
 
-  factory AppState.initial() => AppState._(
-        appLocale: AppLocale.system,
+  factory AppState.initial({AppLocale appLocale}) => AppState._(
+        appLocale: appLocale ?? AppLocale.system,
       );
 
   AppState copyWith({

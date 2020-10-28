@@ -13,6 +13,7 @@ import '../data/item.dart';
 import '../pages/details_page.dart';
 import '../pages/feed_page.dart';
 import '../pages/lang_settings.dart';
+import '../pages/map_page.dart';
 
 class Routes {
   static const String feedPage = '/';
@@ -56,11 +57,13 @@ class FeedPageRoutes {
   static const String jobsPage = '/jobs';
   static const String languageSettings = '/lang_settings';
   static const String newItemsPage = '/newItems';
+  static const String mapsPage = '/maps';
   static const all = <String>{
     detailScreen,
     jobsPage,
     languageSettings,
     newItemsPage,
+    mapsPage,
   };
 }
 
@@ -72,6 +75,7 @@ class FeedPageRouter extends RouterBase {
     RouteDef(FeedPageRoutes.jobsPage, page: JobsPage),
     RouteDef(FeedPageRoutes.languageSettings, page: LanguageSettings),
     RouteDef(FeedPageRoutes.newItemsPage, page: NewItemsPage),
+    RouteDef(FeedPageRoutes.mapsPage, page: MapsPage),
   ];
   @override
   Map<Type, AutoRouteFactory> get pagesMap => _pagesMap;
@@ -101,6 +105,12 @@ class FeedPageRouter extends RouterBase {
         settings: data,
       );
     },
+    MapsPage: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => MapsPage(),
+        settings: data,
+      );
+    },
   };
 }
 
@@ -124,6 +134,8 @@ extension FeedPageRouterExtendedNavigatorStateX on ExtendedNavigatorState {
 
   Future<dynamic> pushNewItemsPage() =>
       push<dynamic>(FeedPageRoutes.newItemsPage);
+
+  Future<dynamic> pushMapsPage() => push<dynamic>(FeedPageRoutes.mapsPage);
 }
 
 /// ************************************************************************

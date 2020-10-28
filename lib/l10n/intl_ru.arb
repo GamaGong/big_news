@@ -7,5 +7,6 @@
   "failedToLoadPage": "Не удалось загрузить страницу",
   "loadingItem": "Загрузка...",
   "noUrlText": "Ссылка отсутсвует. Простите :(",
-  "errorTextWithError": "Упс... Что-то пошло не так :({error})"
+  "errorTextWithError": "Упс... Что-то пошло не так :({error})",
+  "maps": "Карты"
 }

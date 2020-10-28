@@ -10,8 +10,9 @@ enum AppLocale {
 }
 
 extension LocaleExtenstion on AppLocale {
-
-  static Map<AppLocale, Locale> _langCodes = Map.fromIterables(AppLocale.values.where((element) => element != AppLocale.system), S.delegate.supportedLocales);
+  static Map<AppLocale, Locale> _langCodes = Map.fromIterables(
+      AppLocale.values.where((element) => element != AppLocale.system),
+      S.delegate.supportedLocales);
 
   static const _langTags = {
     AppLocale.en: '🇺🇸',
@@ -23,4 +24,8 @@ extension LocaleExtenstion on AppLocale {
   Locale get locale => _langCodes[this];
 
   String get tag => _langTags[this];
+
+  static AppLocale fromString(String str) => (str != null && str.isNotEmpty)
+      ? AppLocale.values.firstWhere((element) => element.tag == str)
+      : AppLocale.system;
 }

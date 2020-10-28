@@ -7,5 +7,6 @@
   "failedToLoadPage": "Failed to load page",
   "loadingItem": "Loading...",
   "noUrlText": "No url. Sorry :(",
-  "errorTextWithError": "Ops... Something went wrong :({error})"
+  "errorTextWithError": "Ops... Something went wrong :({error})",
+  "maps": "Maps"
 }

@@ -27,6 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "failedToLoadItem" : MessageLookupByLibrary.simpleMessage("Не удалось загрузить элемент"),
     "failedToLoadPage" : MessageLookupByLibrary.simpleMessage("Не удалось загрузить страницу"),
     "loadingItem" : MessageLookupByLibrary.simpleMessage("Загрузка..."),
+    "maps" : MessageLookupByLibrary.simpleMessage("Карты"),
     "noUrlText" : MessageLookupByLibrary.simpleMessage("Ссылка отсутсвует. Простите :("),
     "pageJob" : MessageLookupByLibrary.simpleMessage("Работа"),
     "pageNewStories" : MessageLookupByLibrary.simpleMessage("Новинки"),
