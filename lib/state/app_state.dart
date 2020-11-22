@@ -49,11 +49,15 @@ class FeedScreenState {
     @required this.itemsStates,
   });
 
-  factory FeedScreenState.initial() {
+  factory FeedScreenState.initial({
+    BuiltList itemsIds,
+    LoadingState loadingState,
+    BuiltMap<int, ItemState> itemsStates,
+  }) {
     return FeedScreenState._(
-      itemsIds: BuiltList(),
-      loadingState: LoadingState.none,
-      itemsStates: BuiltMap(),
+      itemsIds: itemsIds ?? BuiltList(),
+      loadingState: loadingState ?? LoadingState.none,
+      itemsStates: itemsStates ?? BuiltMap(),
     );
   }
 

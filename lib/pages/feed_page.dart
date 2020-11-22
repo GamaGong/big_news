@@ -27,6 +27,7 @@ class _FeedPageState extends State<FeedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
+        key: ValueKey('bottomNavBar'),
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         onTap: _onTap,
@@ -44,7 +45,7 @@ class _FeedPageState extends State<FeedPage> {
               label: S.of(context).maps
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.settings, key: ValueKey('langSettings')),
             label: S.of(context).pageSettings,
           ),
         ],

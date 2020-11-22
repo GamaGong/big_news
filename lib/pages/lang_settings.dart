@@ -1,4 +1,3 @@
-import 'package:big_news/state/actions.dart';
 import 'package:big_news/state/app_state.dart';
 import 'package:big_news/state/locale.dart';
 import 'package:big_news/state/middleware.dart';
@@ -28,10 +27,10 @@ class LangItem extends StatelessWidget {
   final bool isChecked;
   final Function(AppLocale) onPressed;
 
-  LangItem(this.appLocale, this.isChecked, this.onPressed);
+  LangItem(this.appLocale, this.isChecked, this.onPressed, {Key key}): super(key: key);
 
   factory LangItem.fromAppLocale(AppLocale appLocale, LangViewModel vm) =>
-      LangItem(appLocale, appLocale == vm.currentLocale, vm.setLocale);
+      LangItem(appLocale, appLocale == vm.currentLocale, vm.setLocale, key: ValueKey(appLocale.tag),);
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +39,18 @@ class LangItem extends StatelessWidget {
       child: RaisedButton(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(
-            appLocale.tag,
-            style: TextStyle(fontSize: 50),
+          child: Column(
+            children: [
+              Text(
+                appLocale.tag,
+                style: TextStyle(fontSize: 50),
+              ),
+              if (isChecked) Text(
+                appLocale.locale.toLanguageTag(),
+                key: ValueKey('langTag'),
+                style: TextStyle(fontSize: 24),
+              ),
+            ],
           ),
         ),
         onPressed: isChecked ? null : () => onPressed(appLocale),

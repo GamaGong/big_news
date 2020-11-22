@@ -21,7 +21,7 @@ extension LocaleExtenstion on AppLocale {
   };
 
   @nullable
-  Locale get locale => _langCodes[this];
+  Locale get locale => _langCodes[this] ?? Locale('sys');
 
   String get tag => _langTags[this];
 
