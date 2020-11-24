@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:auto_route/auto_route.dart';
 import 'package:big_news/api/api.dart';
 import 'package:big_news/generated/l10n.dart';
@@ -21,11 +23,16 @@ class FeedPage extends StatefulWidget {
 }
 
 class _FeedPageState extends State<FeedPage> {
+  final ScrollController _controller = new ScrollController();
+
   int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        flexibleSpace: AppBarGearComposition(_controller),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         key: ValueKey('bottomNavBar'),
         currentIndex: _selectedIndex,
@@ -41,8 +48,8 @@ class _FeedPageState extends State<FeedPage> {
             label: S.of(context).pageJob,
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.map),
-              label: S.of(context).maps
+            icon: Icon(Icons.map),
+            label: S.of(context).maps,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings, key: ValueKey('langSettings')),
@@ -112,6 +119,7 @@ class NewItemsPage extends StatelessWidget {
           switch (vm.loadingState) {
             case LoadingState.loaded:
               return ListView.builder(
+                controller: context.findAncestorStateOfType<_FeedPageState>()._controller,
                 itemCount: vm.itemsIds.length,
                 itemBuilder: (BuildContext context, int index) => ItemWidget(
                   vm.itemsIds[index],
@@ -173,3 +181,61 @@ class JobsPage extends StatelessWidget {
     );
   }
 }
+
+class RotatedGear extends StatelessWidget {
+  RotatedGear(
+      {Key key,
+      this.controller,
+      @required this.gearSize,
+      this.isInverted = false})
+      : super(key: key);
+
+  final ScrollController controller;
+  final double gearSize;
+  final bool isInverted;
+
+  get offset => controller.hasClients ? controller.offset : 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+        animation: controller,
+        builder: (BuildContext context, Widget child) {
+          return Transform.rotate(
+              angle: ((math.pi * offset) / 1024 * (isInverted ? -1 : 1)),
+              child: Icon(Icons.settings, size: gearSize, color: Colors.white));
+        });
+  }
+}
+
+class AppBarGearComposition extends StatelessWidget {
+  final ScrollController _controller;
+
+  AppBarGearComposition(this._controller);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned(
+          top: 15,
+          left: 5,
+          child: RotatedGear(
+            controller: _controller,
+            gearSize: 32,
+          ),
+        ),
+        Positioned(
+          top: 10,
+          left: 28,
+          child: RotatedGear(
+            controller: _controller,
+            gearSize: 64,
+            isInverted: true,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
